@@ -1,0 +1,37 @@
+services:
+  - docker
+
+before_install:
+  - docker build -t harbsidhu/react-test -f ./clinet/Dockerfile.dev .
+
+script:
+  - docker run -e CI=true harbsidhu/react-test  npm run test
+
+after_success:
+  - docker build -t harbsidhu/multi-client  ./client 
+  - docker build -t harbsidhu/multi-nginx   ./nginx
+  - docker build -t harbsidhu/multi-server  ./server
+  - docker build -t harbsidhu/multi-worker  ./worker 
+
+# Login to Docker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+# Push Images to Docker Hub
+  - docker push harbsidhu/multi-client
+  - docker push harbsidhu/multi-server
+  - docker push harbsidhu/multi-worker
+  - docker push harbsidhu/multi-nginx
+
+
+#deploy:
+#  provider: elasticbeanstalk
+#  region: "ap-southeast-2"
+#  app: "docker-react"
+#  env: "Docker-env"
+#  bucket_name: "elasticbeanstalk-ap-southeast-2-928226965472"
+#  bucket_path: "docker-react"
+#  on:
+#    branch: master
+#  access_key_id: $AWS_ACCESS_KEY
+#  secret_access_key: 
+#      secure: "$AWS_SECRET_KEY"

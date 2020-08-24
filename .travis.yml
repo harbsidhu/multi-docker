@@ -13,7 +13,7 @@ after_success:
   - docker build -t harbsidhu/multi-server  ./server
   - docker build -t harbsidhu/multi-worker  ./worker 
 
-# Login to Docker
+# Login to Docker Hub
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
 
 # Push Images to Docker Hub
